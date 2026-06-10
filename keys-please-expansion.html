@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keys Please · Expansion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --bg-2: #11141a;
+    --bg-3: #1a1f28;
+    --surface: #161b22;
+    --surface-2: #1e242e;
+    --line: #2a3140;
+    --line-2: #3a4356;
+    --ink: #e6edf3;
+    --ink-2: #b6bfcc;
+    --ink-3: #7a8492;
+    --ink-4: #4a5260;
+    --accent: #f5b800;        /* amber — single warm accent */
+    --accent-2: #ff9d2e;
+    --positive: #4ade80;
+    --negative: #ef4f5f;
+    --neutral: #6b9fff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .num { font-variant-numeric: tabular-nums; }
+  code { font-family: 'JetBrains Mono', monospace; }
+
+  /* === LOGIN === */
+  .login-screen {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 30% 20%, rgba(245,184,0,0.05), transparent 40%),
+      radial-gradient(circle at 70% 80%, rgba(107,159,255,0.04), transparent 50%);
+  }
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 48px 44px;
+    width: 440px;
+    max-width: calc(100% - 32px);
+  }
+  .login-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .login-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .login-title em { font-style: italic; color: var(--accent); }
+  .login-subtitle {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-3);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 11px 14px;
+    color: var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--bg-3);
+  }
+  .btn {
+    width: 100%;
+    padding: 13px 20px;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    cursor: pointer;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .btn:hover:not(:disabled) { background: #ffc933; }
+  .btn:disabled { background: var(--bg-3); color: var(--ink-4); cursor: not-allowed; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-2);
+    border: 1px solid var(--line-2);
+  }
+  .btn-ghost:hover { background: var(--surface-2); color: var(--ink); }
+  .login-hint {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+    color: var(--ink-3);
+    line-height: 1.7;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .login-hint code { color: var(--accent); }
+  .err {
+    color: var(--negative);
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 8px;
+  }
+
+  /* === APP === */
+  .app { display: none; }
+  .app.shown { display: block; }
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .brand-mark {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .brand-mark em { font-style: italic; color: var(--accent); }
+  .brand-divider {
+    width: 1px;
+    height: 22px;
+    background: var(--line-2);
+  }
+  .brand-context {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+  .brand-context strong {
+    display: block;
+    color: var(--accent);
+    font-size: 11px;
+    margin-top: 2px;
+    font-weight: 700;
+  }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .live-ind {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--positive);
+    box-shadow: 0 0 8px var(--positive);
+    animation: pulse 2s infinite;
+  }
+  .live-ind.bad .live-dot {
+    background: var(--negative);
+    box-shadow: 0 0 8px var(--negative);
+    animation: none;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px 6px 6px;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    background: var(--surface);
+  }
+  .user-pill .av {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    display: grid;
+    place-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .user-pill .info {
+    line-height: 1.2;
+  }
+  .user-pill .name {
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .user-pill .role {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+
+  /* === MAIN GRID === */
+  .main {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 32px 28px 80px;
+  }
+
+  /* === HERO === */
+  .hero {
+    margin-bottom: 40px;
+  }
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .hero-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 68px;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+  .hero-title em { font-style: italic; color: var(--accent); }
+  .hero-sub {
+    font-size: 14px;
+    color: var(--ink-3);
+    max-width: 580px;
+    line-height: 1.6;
+  }
+
+  /* === KPI BAR === */
+  .kpi-bar {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    margin-bottom: 40px;
+  }
+  @media (max-width: 1100px) {
+    .kpi-bar { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .kpi-bar { grid-template-columns: repeat(2, 1fr); }
+  }
+  .kpi {
+    padding: 22px 24px;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+  .kpi:last-child { border-right: none; }
+  @media (max-width: 1100px) {
+    .kpi { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .kpi:nth-child(3n) { border-right: none; }
+    .kpi:nth-last-child(-n+3) { border-bottom: none; }
+  }
+  .kpi-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-3);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .kpi-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-sub {
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .kpi-delta {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .kpi-delta.pos { color: var(--positive); }
+  .kpi-delta.neg { color: var(--negative); }
+
+  /* === SECTIONS === */
+  .section {
+    margin-bottom: 56px;
+  }
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .section-head h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .section-head h2 em { font-style: italic; color: var(--accent); }
+  .section-head .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+  }
+
+  /* === OPERATORS TABLE === */
+  .op-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 900px) {
+    .op-grid { grid-template-columns: 1fr; }
+  }
+  .op-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 24px 26px;
+    cursor: pointer;
+    transition: border-color .15s, transform .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .op-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .25s;
+  }
+  .op-card:hover { border-color: var(--line-2); }
+  .op-card:hover::before { transform: scaleX(1); }
+  .op-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .op-card-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    line-height: 1.05;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .op-card-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+  }
+  .op-card-live {
+    background: var(--bg-3);
+    border: 1px solid var(--line-2);
+    padding: 4px 10px;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--positive);
+  }
+  .op-card-live::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--positive);
+    box-shadow: 0 0 5px var(--positive);
+  }
+  .op-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+  }
+  .op-stat {
+    border-right: 1px solid var(--line);
+    padding-right: 14px;
+    margin-right: 14px;
+  }
+  .op-stat:last-child { border-right: none; }
+  .op-stat .v {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .op-stat .l {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+  .op-card-bottom {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .op-card-bottom .occ-bar {
+    flex: 1;
+    margin: 0 16px;
+    height: 4px;
+    background: var(--bg-3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .op-card-bottom .occ-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width .4s;
+  }
+  .op-card-bottom .occ-fill.warn { background: var(--accent-2); }
+  .op-card-bottom .occ-fill.critical { background: var(--negative); }
+
+  /* === ACTIVITY FEED + NETWORK MAP === */
+  .grid-2col {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 1000px) {
+    .grid-2col { grid-template-columns: 1fr; }
+  }
+
+  /* === ACTIVITY === */
+  .activity-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    max-height: 540px;
+    overflow-y: auto;
+  }
+  .activity-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .activity-row:last-child { border-bottom: none; }
+  .activity-row:hover { background: var(--surface-2); }
+  .a-time {
+    color: var(--ink-3);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+  .a-msg {
+    color: var(--ink-2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .a-msg strong { color: var(--ink); }
+  .a-msg code { color: var(--accent); }
+  .a-venue {
+    color: var(--ink-3);
+    font-size: 10px;
+  }
+  .a-op {
+    font-size: 9px;
+    color: var(--accent);
+    background: rgba(245,184,0,0.08);
+    padding: 2px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .a-op.la { color: var(--neutral); background: rgba(107,159,255,0.08); }
+
+  /* === SUMMARY PANEL === */
+  .summary-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 24px;
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row .k {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+  .summary-row .v {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .summary-row .v.accent { color: var(--accent); }
+  .summary-row .v.neg { color: var(--negative); }
+  .summary-row .v.pos { color: var(--positive); }
+
+  /* === ONBOARD BUTTON / MODAL === */
+  .toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .btn-inline {
+    padding: 10px 18px;
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-inline:hover { background: var(--surface-2); border-color: var(--accent); }
+  .btn-inline.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .btn-inline.primary:hover { background: #ffc933; }
+  .btn-inline:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    overflow-y: auto;
+  }
+  .modal-backdrop.open { display: flex; animation: fade-in .25s; }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    width: 100%;
+    max-width: 640px;
+    max-height: 88vh;
+    overflow-y: auto;
+    animation: slide-up .3s cubic-bezier(.2,.7,.2,1);
+  }
+  @keyframes slide-up {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal-head {
+    padding: 24px 28px 18px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .modal-head h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .modal-head h2 em { font-style: italic; color: var(--accent); }
+  .modal-head .sub {
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .modal-close {
+    width: 32px; height: 32px;
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    cursor: pointer;
+    border-radius: 2px;
+    display: grid;
+    place-items: center;
+  }
+  .modal-body {
+    padding: 24px 28px;
+  }
+  .form-section {
+    margin-bottom: 28px;
+  }
+  .form-section-head {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
+  .form-err {
+    background: rgba(239,79,95,0.08);
+    border: 1px solid var(--negative);
+    color: var(--negative);
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    margin-bottom: 16px;
+  }
+
+  /* === LOADING STATES === */
+  .loading {
+    text-align: center;
+    color: var(--ink-3);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 60px 0;
+  }
+
+  /* Operator badge styles — color per operator id */
+  .op-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="login">
+  <div class="login-box">
+    <div class="login-eyebrow">Keys Please · Platform</div>
+    <h1 class="login-title">Expansion <em>Service</em></h1>
+    <p class="login-subtitle">Network command center. For platform administrators overseeing the operator fleet across cities.</p>
+
+    <div class="field">
+      <label>API Endpoint</label>
+      <input id="api-base" placeholder="http://localhost:3000">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input id="email" type="email" placeholder="morgan@keysplease.dev">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input id="password" type="password" placeholder="demo" onkeydown="if(event.key==='Enter') login()">
+    </div>
+    <button class="btn" onclick="login()" id="btn-login">
+      Authenticate
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+    <div class="err" id="login-err" style="display: none;"></div>
+
+    <div class="login-hint">
+      Platform admin: <code>morgan@keysplease.dev</code> / <code>demo</code><br>
+      Sees the entire network — both Keys Please SF and Keys Please LA.
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="brand">
+      <span class="brand-mark">Keys <em>Please</em></span>
+      <span class="brand-divider"></span>
+      <div class="brand-context">Platform · Expansion<strong id="brand-status">— operators · — venues</strong></div>
+    </div>
+    <div class="topbar-right">
+      <div class="live-ind" id="live-ind"><span class="live-dot"></span><span id="live-text">Network live</span></div>
+      <div class="user-pill">
+        <div class="av" id="av">—</div>
+        <div class="info">
+          <div class="name" id="user-name">—</div>
+          <div class="role">Platform Admin</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-eyebrow" id="hero-eyebrow">Last 30 days</div>
+      <h1 class="hero-title">Network <em>at a glance</em></h1>
+      <p class="hero-sub">Every operator, every venue, in one view. Onboard new franchisees, monitor health, route attention where it matters.</p>
+    </div>
+
+    <!-- KPI BAR -->
+    <div class="kpi-bar">
+      <div class="kpi">
+        <div class="kpi-label">Operators</div>
+        <div class="kpi-value num" id="kpi-operators">—</div>
+        <div class="kpi-sub" id="kpi-operators-sub">— active</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Venues</div>
+        <div class="kpi-value num" id="kpi-venues">—</div>
+        <div class="kpi-sub">across the network</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Tickets (period)</div>
+        <div class="kpi-value num" id="kpi-tickets">—</div>
+        <div class="kpi-sub" id="kpi-tickets-sub">— all time</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Revenue (period)</div>
+        <div class="kpi-value num" id="kpi-revenue">—</div>
+        <div class="kpi-sub" id="kpi-revenue-sub">— gratuity</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Active Now</div>
+        <div class="kpi-value num" id="kpi-active">—</div>
+        <div class="kpi-sub">on premises</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Open Incidents</div>
+        <div class="kpi-value num" id="kpi-incidents">—</div>
+        <div class="kpi-sub" id="kpi-incidents-sub">across network</div>
+      </div>
+    </div>
+
+    <!-- OPERATORS SECTION -->
+    <div class="section">
+      <div class="section-head">
+        <h2>Operator <em>fleet</em></h2>
+        <div class="meta">Click for venue detail</div>
+      </div>
+      <div class="toolbar">
+        <button class="btn-inline primary" onclick="openOnboard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Onboard Operator
+        </button>
+      </div>
+      <div class="op-grid" id="op-grid">
+        <div class="loading">Loading operators…</div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY + SUMMARY -->
+    <div class="section">
+      <div class="section-head">
+        <h2>Live <em>activity</em></h2>
+        <div class="meta">Network event stream</div>
+      </div>
+      <div class="grid-2col">
+        <div class="activity-card" id="activity-list">
+          <div class="loading">Loading activity…</div>
+        </div>
+        <div class="summary-panel" id="summary-panel">
+          <div class="summary-row">
+            <span class="k">Network status</span>
+            <span class="v pos">Operational</span>
+          </div>
+          <div class="summary-row">
+            <span class="k">Avg revenue / venue</span>
+            <span class="v num" id="sum-rev-per-venue">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="k">Avg tickets / venue</span>
+            <span class="v num" id="sum-tix-per-venue">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="k">Largest operator</span>
+            <span class="v accent" id="sum-largest">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="k">Fastest growing</span>
+            <span class="v pos" id="sum-growing">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="k">Last network event</span>
+            <span class="v num" id="sum-last-event" style="font-size: 11px;">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ONBOARD MODAL -->
+<div class="modal-backdrop" id="onboard-modal" onclick="if(event.target===this) closeOnboard()">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h2>Onboard a <em>new operator</em></h2>
+        <div class="sub">Creates the operator entity, its first venue, and its founding manager.</div>
+      </div>
+      <button class="modal-close" onclick="closeOnboard()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-err" id="onboard-err" style="display: none;"></div>
+
+      <div class="form-section">
+        <div class="form-section-head">01 · Operator entity</div>
+        <div class="field">
+          <label>Operator Name</label>
+          <input id="ob-op-name" placeholder="Keys Please New York">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-head">02 · First venue</div>
+        <div class="form-row">
+          <div class="field">
+            <label>Venue Display Name</label>
+            <input id="ob-venue-name" placeholder="Le Bernardin">
+          </div>
+          <div class="field">
+            <label>Legal Entity Name</label>
+            <input id="ob-legal-name" placeholder="Le Bernardin Restaurant Inc.">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Venue Type</label>
+            <select id="ob-venue-type">
+              <option value="fine_dining">Fine dining</option>
+              <option value="boutique_hotel">Boutique hotel</option>
+              <option value="restaurant">Restaurant</option>
+              <option value="casino">Casino</option>
+              <option value="event_venue">Event venue</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Tier</label>
+            <select id="ob-tier">
+              <option value="premium">Premium</option>
+              <option value="standard">Standard</option>
+              <option value="economy">Economy</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Address</label>
+            <input id="ob-address" placeholder="155 W 51st St, New York">
+          </div>
+          <div class="field">
+            <label>Base Rate (¢)</label>
+            <input id="ob-rate" type="number" value="2000" min="500" max="10000">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-head">03 · Founding manager</div>
+        <div class="form-row">
+          <div class="field">
+            <label>Name</label>
+            <input id="ob-mgr-name" placeholder="Jordan Smith">
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input id="ob-mgr-email" type="email" placeholder="jordan@keysplease.dev">
+          </div>
+        </div>
+        <div class="field">
+          <label>Initial Password</label>
+          <input id="ob-mgr-pw" type="text" placeholder="Auto-emailed in production">
+        </div>
+      </div>
+
+      <button class="btn" onclick="submitOnboard()" id="ob-submit">
+        Create Operator
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+let API_BASE = localStorage.getItem('kp_exp_api') || 'http://localhost:3000';
+let JWT = localStorage.getItem('kp_exp_jwt') || null;
+let USER = JSON.parse(localStorage.getItem('kp_exp_user') || 'null');
+let opIdToColor = {};  // assign deterministic colors to operators
+
+document.getElementById('api-base').value = API_BASE;
+
+async function api(path, opts = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(JWT ? { 'Authorization': 'Bearer ' + JWT } : {}),
+    ...(opts.headers || {}),
+  };
+  const res = await fetch(API_BASE + path, { ...opts, headers });
+  if (res.status === 401) { logout(); throw new Error('Session expired'); }
+  if (!res.ok) {
+    const b = await res.json().catch(() => ({}));
+    throw new Error(b.error || ('HTTP ' + res.status));
+  }
+  return res.json();
+}
+
+function logout() {
+  JWT = null;
+  USER = null;
+  localStorage.removeItem('kp_exp_jwt');
+  localStorage.removeItem('kp_exp_user');
+  document.getElementById('app').classList.remove('shown');
+  document.getElementById('login').style.display = 'grid';
+}
+
+async function login() {
+  const email = document.getElementById('email').value.trim();
+  const pw = document.getElementById('password').value;
+  API_BASE = document.getElementById('api-base').value.replace(/\/$/, '');
+  localStorage.setItem('kp_exp_api', API_BASE);
+  const errEl = document.getElementById('login-err');
+  errEl.style.display = 'none';
+
+  try {
+    const r = await fetch(API_BASE + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pw }),
+    });
+    if (!r.ok) {
+      const b = await r.json().catch(() => ({}));
+      throw new Error(b.error || 'Invalid credentials');
+    }
+    const data = await r.json();
+    if (data.user.role !== 'platform_admin') {
+      throw new Error('Platform admin access required. Try morgan@keysplease.dev');
+    }
+    JWT = data.token;
+    USER = data.user;
+    localStorage.setItem('kp_exp_jwt', JWT);
+    localStorage.setItem('kp_exp_user', JSON.stringify(USER));
+    showApp();
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+function showApp() {
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').classList.add('shown');
+  const initials = (USER.name || 'U').split(' ').map(s => s[0]).slice(0,2).join('');
+  document.getElementById('av').textContent = initials;
+  document.getElementById('user-name').textContent = USER.name;
+  refreshAll();
+  connectWS();
+  setInterval(refreshAll, 60000);
+}
+
+// === Realtime ===
+let ws = null;
+let wsRetryTimer = null;
+let wsRefreshDebounce = null;
+
+function connectWS() {
+  if (!JWT) return;
+  if (ws) try { ws.close(); } catch {}
+  const base = API_BASE.replace(/^http/, 'ws');
+  try {
+    ws = new WebSocket(`${base}/realtime?token=${encodeURIComponent(JWT)}`);
+  } catch {
+    scheduleWSRetry();
+    return;
+  }
+  ws.onopen = () => {
+    document.getElementById('live-ind').classList.remove('bad');
+    document.getElementById('live-text').textContent = 'Network live';
+  };
+  ws.onmessage = (m) => {
+    let data;
+    try { data = JSON.parse(m.data); } catch { return; }
+    if (data.type === 'event') {
+      prependActivity(data.event);
+      if (wsRefreshDebounce) clearTimeout(wsRefreshDebounce);
+      wsRefreshDebounce = setTimeout(refreshAll, 800);
+    }
+  };
+  ws.onclose = () => {
+    document.getElementById('live-ind').classList.add('bad');
+    document.getElementById('live-text').textContent = 'Reconnecting';
+    scheduleWSRetry();
+  };
+  ws.onerror = () => {};
+}
+function scheduleWSRetry() {
+  if (wsRetryTimer) clearTimeout(wsRetryTimer);
+  wsRetryTimer = setTimeout(connectWS, 4000);
+}
+
+// === Data fetch ===
+async function refreshAll() {
+  try {
+    const [summary, operators, activity] = await Promise.all([
+      api('/platform/summary?days=30'),
+      api('/platform/operators?days=30'),
+      api('/platform/activity?limit=30'),
+    ]);
+    renderSummary(summary);
+    renderOperators(operators);
+    renderActivity(activity);
+    renderSidePanel(summary, operators);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function fmtMoney(cents) {
+  const dollars = (cents || 0) / 100;
+  if (dollars >= 1000000) return '$' + (dollars/1000000).toFixed(1) + 'M';
+  if (dollars >= 10000) return '$' + (dollars/1000).toFixed(1) + 'k';
+  return '$' + dollars.toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+function fmtNum(n) {
+  return (n || 0).toLocaleString('en-US');
+}
+function fmtDelta(pct) {
+  if (pct === null || pct === undefined) return '';
+  const sign = pct >= 0 ? '+' : '';
+  const cls = pct >= 0 ? 'pos' : 'neg';
+  return `<span class="kpi-delta ${cls}">${sign}${pct}%</span>`;
+}
+function timeAgo(ts) {
+  const sec = Math.round((Date.now() - new Date(ts)) / 1000);
+  if (sec < 60) return sec + 's';
+  if (sec < 3600) return Math.round(sec / 60) + 'm';
+  if (sec < 86400) return Math.round(sec / 3600) + 'h';
+  return Math.round(sec / 86400) + 'd';
+}
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderSummary(s) {
+  document.getElementById('kpi-operators').textContent = fmtNum(s.operators_total);
+  document.getElementById('kpi-operators-sub').textContent = `${s.operators_total} active`;
+  document.getElementById('kpi-venues').textContent = fmtNum(s.venues_total);
+  document.getElementById('kpi-tickets').textContent = fmtNum(s.tickets.period);
+  document.getElementById('kpi-tickets-sub').textContent = `${fmtNum(s.tickets.all_time)} all time`;
+  document.getElementById('kpi-revenue').textContent = fmtMoney(s.revenue.cents);
+  document.getElementById('kpi-revenue-sub').textContent = `${fmtMoney(s.revenue.gratuity_cents)} gratuity`;
+  document.getElementById('kpi-active').textContent = fmtNum(s.tickets.active_now);
+  document.getElementById('kpi-incidents').textContent = fmtNum(s.incidents.open);
+  document.getElementById('kpi-incidents-sub').textContent = `of ${fmtNum(s.incidents.total)} total`;
+
+  document.getElementById('brand-status').textContent =
+    `${s.operators_total} operators · ${s.venues_total} venues`;
+}
+
+function renderOperators(data) {
+  const grid = document.getElementById('op-grid');
+  grid.innerHTML = '';
+  if (!data.operators.length) {
+    grid.innerHTML = '<div class="loading">No operators in the network yet.</div>';
+    return;
+  }
+
+  // Assign colors to operators (deterministic)
+  data.operators.forEach((op, i) => {
+    if (!opIdToColor[op.id]) {
+      opIdToColor[op.id] = i % 2 === 0 ? '' : 'la';   // first / second tone
+    }
+  });
+
+  for (const op of data.operators) {
+    const card = document.createElement('div');
+    card.className = 'op-card';
+    const occClass =
+      op.stalls.occupancy_pct >= 95 ? 'critical' :
+      op.stalls.occupancy_pct >= 85 ? 'warn' : '';
+    const deltaTickets = op.tickets.delta_pct;
+    const deltaRev = op.revenue_delta_pct;
+    card.innerHTML = `
+      <div class="op-card-head">
+        <div>
+          <div class="op-card-name">${escapeHtml(op.name)}</div>
+          <div class="op-card-meta">${op.venue_count} venues · since ${new Date(op.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</div>
+        </div>
+        <div class="op-card-live">${op.active_now} live</div>
+      </div>
+      <div class="op-stats">
+        <div class="op-stat">
+          <div class="v">${fmtMoney(op.revenue_cents)}${fmtDelta(deltaRev)}</div>
+          <div class="l">Revenue · 30d</div>
+        </div>
+        <div class="op-stat">
+          <div class="v">${fmtNum(op.tickets.total)}${fmtDelta(deltaTickets)}</div>
+          <div class="l">Tickets · 30d</div>
+        </div>
+        <div class="op-stat">
+          <div class="v">${op.open_incidents}</div>
+          <div class="l">Open incidents</div>
+        </div>
+      </div>
+      <div class="op-card-bottom">
+        <span>Occupancy ${op.stalls.occupancy_pct}%</span>
+        <div class="occ-bar"><div class="occ-fill ${occClass}" style="width: ${op.stalls.occupancy_pct}%"></div></div>
+        <span>${op.stalls.occupied}/${op.stalls.total}</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+}
+
+const EVENT_VERBS = {
+  'ticket.created':      ['checked in', ''],
+  'video.uploaded':      ['uploaded walk-around for', ''],
+  'ticket.parked':       ['parked', ''],
+  'retrieval.requested': ['requested retrieval of', ''],
+  'payment.completed':   ['payment received for', ''],
+  'ticket.completed':    ['delivered', ''],
+  'stall.occupied':      ['occupied stall', ''],
+  'stall.released':      ['released stall', ''],
+  'incident.flagged':    ['flagged incident on', ''],
+  'incident.reviewed':   ['began reviewing incident on', ''],
+  'incident.resolved':   ['resolved incident on', ''],
+  'operator.onboarded':  ['onboarded new operator', ''],
+};
+
+function renderActivity(data) {
+  const list = document.getElementById('activity-list');
+  list.innerHTML = '';
+  if (!data.events.length) {
+    list.innerHTML = '<div class="loading">No network activity yet.</div>';
+    return;
+  }
+  for (const e of data.events.slice(0, 25)) {
+    list.appendChild(activityRow(e));
+  }
+}
+
+function activityRow(e) {
+  const row = document.createElement('div');
+  row.className = 'activity-row';
+  const verb = (EVENT_VERBS[e.type] || [e.type.replace(/\./g, ' '), ''])[0];
+  const token = e.ticket_token ? `<code>#${e.ticket_token}</code>` : '';
+  const opTagClass = e.operator_name?.includes('Los Angeles') ? 'la' : '';
+  row.innerHTML = `
+    <span class="a-time">${timeAgo(e.created_at)}</span>
+    <span class="a-msg"><strong>${escapeHtml(e.actor_name)}</strong> ${verb} ${token}</span>
+    <span class="a-venue">${escapeHtml(e.venue_name || '—')}</span>
+    <span class="a-op ${opTagClass}">${escapeHtml((e.operator_name || '').replace('Keys Please ', ''))}</span>
+  `;
+  return row;
+}
+
+function prependActivity(event) {
+  const list = document.getElementById('activity-list');
+  // Strip "loading" if it's there
+  const first = list.firstChild;
+  if (first?.classList?.contains('loading')) list.innerHTML = '';
+
+  const row = activityRow({
+    ...event,
+    actor_name: 'Live',
+    venue_name: event.payload?.venue_name || '—',
+    operator_name: '',
+  });
+  row.style.background = 'rgba(245,184,0,0.06)';
+  list.insertBefore(row, list.firstChild);
+  setTimeout(() => { row.style.background = ''; row.style.transition = 'background 1s'; }, 80);
+
+  // Cap at 50 rows
+  while (list.children.length > 50) list.removeChild(list.lastChild);
+}
+
+function renderSidePanel(summary, operatorsData) {
+  const ops = operatorsData.operators;
+  if (!ops.length) return;
+
+  const totalRevenue = ops.reduce((s, o) => s + o.revenue_cents, 0);
+  const totalTickets = ops.reduce((s, o) => s + o.tickets.total, 0);
+  const totalVenues = ops.reduce((s, o) => s + o.venue_count, 0);
+
+  document.getElementById('sum-rev-per-venue').textContent =
+    fmtMoney(totalVenues ? totalRevenue / totalVenues : 0);
+  document.getElementById('sum-tix-per-venue').textContent =
+    Math.round(totalVenues ? totalTickets / totalVenues : 0);
+
+  const largest = ops.reduce((a, b) => (a.revenue_cents > b.revenue_cents ? a : b), ops[0]);
+  document.getElementById('sum-largest').textContent = largest.name.replace('Keys Please ', '');
+
+  const growing = ops.filter(o => o.revenue_delta_pct !== null)
+                     .reduce((a, b) => (a.revenue_delta_pct > b.revenue_delta_pct ? a : b), ops[0]);
+  document.getElementById('sum-growing').textContent =
+    growing ? `${growing.name.replace('Keys Please ', '')} (+${growing.revenue_delta_pct}%)` : '—';
+
+  document.getElementById('sum-last-event').textContent =
+    summary.last_event_at
+      ? new Date(summary.last_event_at).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+      : '—';
+}
+
+// === Onboard ===
+function openOnboard() {
+  document.getElementById('onboard-modal').classList.add('open');
+  document.getElementById('onboard-err').style.display = 'none';
+}
+function closeOnboard() {
+  document.getElementById('onboard-modal').classList.remove('open');
+}
+
+async function submitOnboard() {
+  const errEl = document.getElementById('onboard-err');
+  errEl.style.display = 'none';
+  const btn = document.getElementById('ob-submit');
+  btn.disabled = true;
+  btn.innerHTML = 'Creating…';
+  try {
+    const body = {
+      operator_name: document.getElementById('ob-op-name').value.trim(),
+      venue: {
+        name: document.getElementById('ob-legal-name').value.trim(),
+        venue_name: document.getElementById('ob-venue-name').value.trim(),
+        venue_type: document.getElementById('ob-venue-type').value,
+        tier: document.getElementById('ob-tier').value,
+        address: document.getElementById('ob-address').value.trim(),
+        base_rate_cents: parseInt(document.getElementById('ob-rate').value, 10),
+      },
+      manager: {
+        name: document.getElementById('ob-mgr-name').value.trim(),
+        email: document.getElementById('ob-mgr-email').value.trim(),
+        password: document.getElementById('ob-mgr-pw').value || 'demo',
+      },
+    };
+    const result = await api('/platform/onboard', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    closeOnboard();
+    // Clear fields
+    document.querySelectorAll('.modal input').forEach(i => i.value = '');
+    document.getElementById('ob-rate').value = '2000';
+    refreshAll();
+    alert(`Onboarded ${result.operator.name}.\nVenue: ${result.venue.venue_name}\nManager: ${result.manager.email}`);
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Create Operator <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>';
+  }
+}
+
+// Boot
+if (JWT && USER && USER.role === 'platform_admin') {
+  showApp();
+}
+</script>
+</body>
+</html>
