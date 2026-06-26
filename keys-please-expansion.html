@@ -289,6 +289,133 @@
     outline-offset: 2px;
   }
 
+  /* === MAINTENANCE SECTION === */
+  .maint-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 24px;
+  }
+  .maint-card .maint-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #ff7a59;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .maint-card .maint-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+  .maint-card .maint-desc {
+    font-size: 13px;
+    color: var(--ink-3);
+    margin-bottom: 18px;
+    line-height: 1.55;
+  }
+  .maint-card .maint-stats {
+    display: flex;
+    gap: 24px;
+    padding: 14px 16px;
+    background: var(--bg);
+    border-radius: 4px;
+    margin-bottom: 18px;
+  }
+  .maint-card .maint-stat .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+  }
+  .maint-card .maint-stat .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    color: var(--ink);
+    margin-top: 4px;
+  }
+  .btn-danger {
+    background: transparent;
+    border: 1px solid #ff7a59;
+    color: #ff7a59;
+    padding: 9px 18px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-danger:hover:not(:disabled) {
+    background: rgba(255, 122, 89, 0.1);
+  }
+  .btn-danger:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    padding: 9px 18px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 8px;
+  }
+  .btn-ghost:hover:not(:disabled) { background: var(--bg); }
+
+  /* Active ticket list inside the cleanup modal */
+  .active-ticket-list {
+    max-height: 360px;
+    overflow-y: auto;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--bg);
+    margin-bottom: 16px;
+  }
+  .active-ticket-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 1fr 1fr 80px;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+    align-items: center;
+  }
+  .active-ticket-row:last-child { border-bottom: none; }
+  .active-ticket-row .tok {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .active-ticket-row .venue {
+    color: var(--ink-2);
+    font-size: 11px;
+  }
+  .active-ticket-row .status-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: var(--line);
+    color: var(--ink-2);
+    display: inline-block;
+    width: fit-content;
+  }
+  .active-ticket-row .status-chip.parked { background: rgba(245, 184, 0, 0.15); color: var(--accent); }
+  .active-ticket-row .status-chip.pending { background: rgba(122, 132, 146, 0.2); color: var(--ink-2); }
+
   /* === MAIN GRID === */
   .main {
     max-width: 1440px;
@@ -931,10 +1058,60 @@
         </div>
       </div>
     </div>
+    <!-- MAINTENANCE -->
+    <div class="section" style="margin-top: 56px;">
+      <div class="section-head">
+        <h2><em>Maintenance</em></h2>
+        <div class="meta">Platform admin · destructive operations</div>
+      </div>
+      <div class="maint-card">
+        <div class="maint-eyebrow">⚠ Demo cleanup</div>
+        <div class="maint-title">Bulk-complete active tickets</div>
+        <div class="maint-desc">
+          Force-close active demo tickets across the network, freeing the stalls they occupy and releasing their tokens. Use this after testing or load runs to clean up the parked-everywhere state. Pre-authorizations on test cards are <strong>not captured</strong>; Stripe releases unaptured holds automatically.
+        </div>
+        <div class="maint-stats">
+          <div class="maint-stat">
+            <div class="label">Active tickets</div>
+            <div class="value" id="maint-active-count">—</div>
+          </div>
+          <div class="maint-stat">
+            <div class="label">Occupied stalls</div>
+            <div class="value" id="maint-occ-count">—</div>
+          </div>
+        </div>
+        <button class="btn-danger" onclick="openCleanupModal()">
+          Open cleanup tool →
+        </button>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<!-- ONBOARD MODAL -->
+<!-- CLEANUP MODAL -->
+<div class="modal-backdrop" id="cleanup-modal" onclick="if(event.target===this) closeCleanupModal()">
+  <div class="modal" style="max-width: 720px;">
+    <div class="modal-head">
+      <div>
+        <h2><em>Demo</em> cleanup</h2>
+        <div class="sub">Force-close active tickets and free their stalls. This action cannot be undone.</div>
+      </div>
+      <button class="modal-close" onclick="closeCleanupModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="cleanup-status" style="font-family:'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-3); margin-bottom: 14px;">Loading active tickets…</div>
+      <div class="active-ticket-list" id="active-ticket-list"></div>
+      <div id="cleanup-result" style="display:none; padding: 12px 16px; border-radius: 4px; background: rgba(245, 184, 0, 0.1); border-left: 2px solid var(--accent); font-size: 12px; color: var(--ink); margin-bottom: 14px;"></div>
+      <div style="display: flex; justify-content: flex-end; align-items: center;">
+        <button class="btn-ghost" onclick="closeCleanupModal()">Cancel</button>
+        <button class="btn-danger" id="cleanup-confirm-btn" onclick="confirmBulkComplete()" disabled>Complete all listed tickets</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal-backdrop" id="onboard-modal" onclick="if(event.target===this) closeOnboard()">
   <div class="modal">
     <div class="modal-head">
@@ -1181,6 +1358,24 @@ async function refreshAll() {
   } catch (e) {
     console.error(e);
   }
+  // Also refresh the maintenance stats. Failures here are non-fatal — the
+  // maintenance section is non-critical and its counts can stay '—' if the
+  // endpoint is unreachable. (This endpoint is new; older backends will 404.)
+  refreshMaintenanceStats();
+}
+
+async function refreshMaintenanceStats() {
+  try {
+    const data = await api('/platform/active-tickets');
+    document.getElementById('maint-active-count').textContent = data.count;
+    // Count tickets that hold a stall (parked + retrieving)
+    const stallsHeld = data.tickets.filter(t => t.stall_id).length;
+    document.getElementById('maint-occ-count').textContent = stallsHeld;
+  } catch (e) {
+    // Silent — older backends without /platform/active-tickets will land here
+    document.getElementById('maint-active-count').textContent = '—';
+    document.getElementById('maint-occ-count').textContent = '—';
+  }
 }
 
 function fmtMoney(cents) {
@@ -1376,6 +1571,92 @@ function openOnboard() {
 }
 function closeOnboard() {
   document.getElementById('onboard-modal').classList.remove('open');
+}
+
+// === Demo cleanup ===
+//
+// Lets a platform admin force-close all active tickets in the network. This
+// frees occupied stalls and releases the 4-digit token namespace. Used
+// primarily for clearing test data between demos / load runs.
+//
+// Two API calls in the flow:
+//   1. GET /platform/active-tickets — fetches the current list to show in
+//      the modal so the admin can see what would be closed.
+//   2. POST /platform/bulk-complete with { all: true } — performs the close.
+//
+// Pre-authorizations on demo tickets are intentionally NOT captured. Stripe
+// expires unaptured holds automatically.
+
+let cleanupActiveTickets = [];
+
+async function openCleanupModal() {
+  document.getElementById('cleanup-modal').classList.add('open');
+  document.getElementById('cleanup-result').style.display = 'none';
+  document.getElementById('cleanup-confirm-btn').disabled = true;
+  const status = document.getElementById('cleanup-status');
+  const list = document.getElementById('active-ticket-list');
+  status.textContent = 'Loading active tickets…';
+  list.innerHTML = '';
+  try {
+    const data = await api('/platform/active-tickets');
+    cleanupActiveTickets = data.tickets || [];
+    if (cleanupActiveTickets.length === 0) {
+      status.textContent = 'No active tickets — nothing to clean up.';
+      document.getElementById('cleanup-confirm-btn').disabled = true;
+      return;
+    }
+    status.textContent = `${cleanupActiveTickets.length} active ticket(s) across the network`;
+    list.innerHTML = cleanupActiveTickets.map(t => `
+      <div class="active-ticket-row">
+        <div class="tok">#${t.token}</div>
+        <div>
+          <div>${t.vehicle_label}</div>
+          <div class="venue">${t.venue_name} · ${t.plate}</div>
+        </div>
+        <div><span class="status-chip ${t.status}">${t.status}</span></div>
+        <div class="venue">${t.stall_id ? 'Stall ' + t.stall_id.slice(-4) : 'no stall'}</div>
+        <div class="venue" style="text-align:right">${new Date(t.check_in_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+    `).join('');
+    document.getElementById('cleanup-confirm-btn').disabled = false;
+  } catch (e) {
+    status.textContent = 'Could not load active tickets: ' + e.message;
+  }
+}
+
+function closeCleanupModal() {
+  document.getElementById('cleanup-modal').classList.remove('open');
+}
+
+async function confirmBulkComplete() {
+  // Two layers of confirmation: a JS confirm() before the irreversible call,
+  // because this completes tickets across the entire network in one shot.
+  const count = cleanupActiveTickets.length;
+  if (!confirm(`Force-complete all ${count} active ticket(s)? This frees their stalls and cannot be undone.`)) {
+    return;
+  }
+  const btn = document.getElementById('cleanup-confirm-btn');
+  const result = document.getElementById('cleanup-result');
+  btn.disabled = true;
+  btn.textContent = 'Completing…';
+  try {
+    const r = await api('/platform/bulk-complete', {
+      method: 'POST',
+      body: JSON.stringify({ all: true }),
+    });
+    result.innerHTML = `<strong>Done.</strong> Completed ${r.completed} of ${r.requested} ticket(s). Freed ${r.stalls_freed} stall(s). ${r.errors.length ? r.errors.length + ' error(s).' : ''}`;
+    result.style.display = 'block';
+    btn.textContent = 'Complete all listed tickets';
+    // Refresh the maintenance stats and reload the modal's list so the user
+    // can see the empty state
+    refreshMaintenanceStats();
+    setTimeout(() => openCleanupModal(), 600);
+  } catch (e) {
+    result.innerHTML = `<strong>Failed:</strong> ${e.message}`;
+    result.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Complete all listed tickets';
+  }
 }
 
 async function submitOnboard() {
