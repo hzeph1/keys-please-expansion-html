@@ -267,6 +267,27 @@
     color: var(--ink-3);
     font-weight: 600;
   }
+  .user-pill .signout-btn {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-3);
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    padding: 0;
+  }
+  .user-pill .signout-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(245, 184, 0, 0.08);
+  }
+  .user-pill .signout-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 
   /* === MAIN GRID === */
   .main {
@@ -806,6 +827,9 @@
           <div class="name" id="user-name">—</div>
           <div class="role">Platform Admin</div>
         </div>
+        <button class="signout-btn" id="signout-btn" onclick="confirmSignOut()" title="Sign out" aria-label="Sign out">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
       </div>
     </div>
   </div>
@@ -1004,7 +1028,20 @@
 </div>
 
 <script>
-let API_BASE = localStorage.getItem('kp_exp_api') || 'https://keys-please-api.onrender.com';
+// Smart API base resolver.
+// Order of precedence:
+//   1. A value previously saved in localStorage (per-device override)
+//   2. The production backend, if this page was served from *.onrender.com
+//   3. localhost:3000 for local development
+function _resolveApiBase() {
+  const saved = localStorage.getItem('kp_exp_api');
+  if (saved) return saved;
+  if (typeof location !== 'undefined' && /\.onrender\.com$/i.test(location.hostname)) {
+    return 'https://keys-please-api.onrender.com';
+  }
+  return 'http://localhost:3000';
+}
+let API_BASE = _resolveApiBase();
 let JWT = localStorage.getItem('kp_exp_jwt') || null;
 let USER = JSON.parse(localStorage.getItem('kp_exp_user') || 'null');
 let opIdToColor = {};  // assign deterministic colors to operators
@@ -1033,6 +1070,16 @@ function logout() {
   localStorage.removeItem('kp_exp_user');
   document.getElementById('app').classList.remove('shown');
   document.getElementById('login').style.display = 'grid';
+}
+
+// User-initiated sign-out from the header button. Confirms before clearing
+// the session so a stray click doesn't kick the user out mid-task.
+// Programmatic logouts (e.g., from a 401 in the api() helper) call logout()
+// directly and bypass this confirmation.
+function confirmSignOut() {
+  if (confirm('Sign out of the platform admin console?')) {
+    logout();
+  }
 }
 
 async function login() {
@@ -1351,7 +1398,7 @@ async function submitOnboard() {
       manager: {
         name: document.getElementById('ob-mgr-name').value.trim(),
         email: document.getElementById('ob-mgr-email').value.trim(),
-        password: document.getElementById('ob-mgr-pw').value || 'demo',
+        password: document.getElementById('ob-mgr-pw').value || 'demo1234',
       },
     };
     const result = await api('/platform/onboard', {
