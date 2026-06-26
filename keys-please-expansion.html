@@ -1083,6 +1083,9 @@
         <button class="btn-danger" onclick="openCleanupModal()">
           Open cleanup tool →
         </button>
+        <button class="btn-danger" style="margin-left: 10px;" onclick="confirmClearGarage()">
+          Clear garage (full reset) →
+        </button>
       </div>
     </div>
 
@@ -1656,6 +1659,38 @@ async function confirmBulkComplete() {
     result.style.display = 'block';
     btn.disabled = false;
     btn.textContent = 'Complete all listed tickets';
+  }
+}
+
+// Full garage reset — completes every active ticket AND forces every stall
+// in the network to 'free' status, including ones in 'blocked' state or
+// 'occupied' with orphan ticket references. More aggressive than the cleanup
+// modal which only operates on ticket state. Use this when the cleanup tool
+// reports "all done" but the staff portal still shows stalls as occupied.
+async function confirmClearGarage() {
+  if (!confirm(
+    'FULL GARAGE RESET\n\n' +
+    'This will:\n' +
+    '  • Force-complete every active ticket across the network\n' +
+    '  • Force every stall to free status (including blocked stalls)\n' +
+    '  • Clear all ticket-to-stall associations\n\n' +
+    'Continue?'
+  )) return;
+
+  try {
+    const r = await api('/platform/clear-garage', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+    alert(
+      `Garage cleared.\n\n` +
+      `Tickets completed: ${r.tickets_completed}\n` +
+      `Stalls freed: ${r.stalls_freed}\n` +
+      `Venues processed: ${r.orgs_processed}`
+    );
+    refreshMaintenanceStats();
+  } catch (e) {
+    alert('Clear-garage failed: ' + e.message);
   }
 }
 
